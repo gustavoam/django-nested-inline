@@ -353,15 +353,17 @@ class NestedInline(InlineModelAdmin):
 
     @property
     def media(self):
+        _media = super(NestedInline, self).media
         extra = '' if settings.DEBUG else '.min'
-        jss = ['admin/js/vendor/jquery/jquery%s.js' % extra]
-        js = ['jquery.init.js', 'inlines-nested%s.js' % extra]
+        _media.add_js(['admin/js/jquery%s.js' % extra,
+                       'admin/js/inlines-nested%s.js' % extra])
         if self.prepopulated_fields:
-            js.extend(['urlify.js', 'prepopulate%s.js' % extra])
+            _media.add_js(['admin/js/urlify.js',
+                           'admin/js/prepopulate%s.js' % extra])
         if self.filter_vertical or self.filter_horizontal:
-            js.extend(['SelectBox.js', 'SelectFilter2.js'])
-        jss.extend([static('admin/js/%s' % url) for url in js])
-        return forms.Media(js=jss)
+            _media.add_js(['admin/js/SelectBox.js',
+                           'admin/js/SelectFilter2.js'])
+        return _media
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
